@@ -20,11 +20,18 @@ jobs:
 
       - name: Commit and Push Changes to Parent Repository
         run: |
+          # Clone the parent repository
           git clone https://github.com/CodeWithDhruvX/go-projects.git
           cd go-projects
+          
+          # Update the submodule
           git submodule update --remote  # Updates the child repo reference in the parent repo
-          git add path/to/child-repository  # Stage changes to the submodule
+          
+          # Stage the submodule changes and commit
+          git add golang-http-server  # Use the actual submodule path from .gitmodules
           git commit -m "Updated child repository submodule"
+          
+          # Push changes to the parent repository
           git push origin main  # Or the relevant branch for the parent repo
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # GitHub token for authentication
