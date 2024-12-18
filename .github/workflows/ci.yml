@@ -1,0 +1,30 @@
+name: Update Parent Repository
+on:
+  push:
+    branches:
+      - main  # or relevant branch for your child repo
+
+jobs:
+  update_parent_repo:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Child Repository
+        uses: actions/checkout@v2
+
+      # (Optional) Add any build or test steps for the child repository
+      - name: Build Child Repository
+        run: |
+          echo "Building child repository..."
+          # Add your build steps here (if any)
+
+      - name: Commit and Push Changes to Parent Repository
+        run: |
+          git clone https://github.com/CodeWithDhruvX/go-projects.git
+          cd go-projects
+          git submodule update --remote  # Updates the child repo reference in the parent repo
+          git add path/to/child-repository  # Stage changes to the submodule
+          git commit -m "Updated child repository submodule"
+          git push origin main  # Or the relevant branch for the parent repo
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # GitHub token for authentication
