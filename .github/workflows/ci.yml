@@ -2,43 +2,37 @@ name: Update Parent Repository
 on:
   push:
     branches:
-      - main  # Trigger workflow when changes are pushed to the main branch
+      - main
 
 jobs:
   update_parent_repo:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout the child repository
-      - name: Checkout Child Repository
-        uses: actions/checkout@v2
-
-      # (Optional) Add any build or test steps for the child repository
-      - name: Build Child Repository
-        run: |
-          echo "Building child repository..."
-          # Add your build steps here (if needed)
-
-      # Step 2: Clone the parent repository and update submodules
       - name: Configure Git User
         run: |
           git config --global user.email "actions@github.com"
           git config --global user.name "github-actions"
 
-      - name: Update Parent Repository Submodule
+      - name: Clone Parent Repository with Submodules
         run: |
-          # Clone the parent repository with submodules
           git clone --recurse-submodules https://github.com/CodeWithDhruvX/go-projects.git
           cd go-projects
 
-          # Update the submodule to the latest commit
-          git submodule update --remote golang-http-server  # Update submodule path
+          # Ensure submodule uses HTTPS
+          git config submodule.golang-http-server.url https://github.com/CodeWithDhruvX/golang-http-server.git
+
+          # Update the submodule
+          git submodule update --remote golang-http-server
 
           # Stage and commit submodule changes
           git add golang-http-server
           git commit -m "Update submodule: golang-http-server to latest commit"
 
-          # Push changes back to the parent repository
+          # Set up authentication
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/CodeWithDhruvX/go-projects.git
+
+          # Push changes to the parent repository
           git push origin main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
